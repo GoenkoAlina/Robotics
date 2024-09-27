@@ -120,3 +120,4 @@ export PATH=/opt/rh/devtoolset-7/root/usr/bin:$PATH
 source /opt/ros/humble/setup.bash
 export ROS_LOCALHOST_ONLY=1
 source ~/ros2_ws/install/local_setup.bash
+export ROS_DOMAIN_ID=2
