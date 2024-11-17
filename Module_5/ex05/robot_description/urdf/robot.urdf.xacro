@@ -1,0 +1,392 @@
+<?xml version="1.0" ?>
+<robot name='robot' xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:include filename="$(find robot_description)/urdf/gazebo.urdf.xacro" />
+
+    <xacro:property name="body_length" value="0.35"/>
+    <xacro:property name="body_radius" value="0.13"/>
+    <xacro:property name="body_mass" value="0.1"/>
+    <xacro:property name="head_size" value="0.16"/>
+    <xacro:property name="head_mass" value="0.1"/>
+    <xacro:property name="antenna_x_y" value="0.02"/>
+    <xacro:property name="antenna_z" value="0.05"/>
+    <xacro:property name="antenna_mass" value="0.2"/>
+    <xacro:property name="eye_size" value="0.025"/>
+    <xacro:property name="eye_mass" value="0.05"/>
+    <xacro:property name="mouth_mass" value="0.15"/>
+    <xacro:property name="mouth_x" value="0.02"/>
+    <xacro:property name="mouth_y" value="0.08"/>
+    <xacro:property name="mouth_z" value="0.02"/>
+    <xacro:property name="chassis_length" value="0.335"/>
+    <xacro:property name="chassis_width" value="0.265"/>
+    <xacro:property name="chassis_height" value="0.05"/>
+    <xacro:property name="wheel_radius" value="0.033"/>
+    <xacro:property name="wheel_thickness" value="0.026"/>
+    <xacro:property name="wheel_mass" value="0.05"/>
+    <xacro:property name="wheel_offset_x" value="0.226"/>
+    <xacro:property name="wheel_offset_y" value="0.1485"/>
+    <xacro:property name="wheel_offset_z" value="0.01"/>
+    <xacro:property name="caster_wheel_radius" value="0.01"/>
+    <xacro:property name="caster_wheel_mass" value="0.01"/>
+    <xacro:property name="caster_wheel_offset_x" value="0.075"/>
+    <xacro:property name="caster_wheel_offset_z" value="${wheel_offset_z - wheel_radius + caster_wheel_radius}"/>
+    <xacro:property name="mass" value="1.0"/>
+    
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <material name="orange">
+        <color rgba="1 0.3 0.1 1"/>
+    </material>
+
+    <material name="blue">
+        <color rgba="0.2 0.2 1 1"/>
+    </material>
+
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+
+    <material name="red">
+        <color rgba="1 0 0 1"/>
+    </material>
+
+    <material name="pink">
+      <color rgba="0.8 0 0.8 1"/>
+    </material>
+
+    <link name="base_link">
+    </link>
+
+    <link name="base_footprint">
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="base_footprint"/>
+        <origin xyz="0 0 -0.138" rpy="0 0 0"/>
+    </joint>
+
+    <joint name="chassis_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="chassis"/>
+        <origin xyz="${-wheel_offset_x} 0 ${-wheel_offset_z}"/>
+    </joint>
+
+    <link name='chassis'>
+    
+    <inertial>
+        <origin xyz="${chassis_length/2} 0 ${chassis_height/2}" rpy="0 0 0"/>
+        <mass value="${mass}" />
+        <inertia ixx="${(1/12) * mass * (chassis_width*chassis_width+chassis_height*chassis_height)}" ixy="0.0" ixz="0.0"
+                 iyy="${(1/12) * mass * (chassis_length*chassis_length+chassis_height*chassis_height)}" iyz="0.0"
+                 izz="${(1/12) * mass * (chassis_length*chassis_length+chassis_width*chassis_width)}" />
+    </inertial>
+    <visual>
+        <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
+        <geometry>
+            <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+        </geometry>
+        <material name="orange"/>
+    </visual>
+    <collision>
+        <origin xyz="${chassis_length/2} 0 ${chassis_height/2}"/>
+        <geometry>
+            <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+        </geometry>
+    </collision>
+    </link>
+
+    <link name="body">
+    <visual>
+      <geometry>
+        <cylinder length="${body_length}" radius="${body_radius}"/>
+      </geometry>
+      <material name="pink"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="${body_length}" radius="${body_radius}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${body_mass}"/>
+      <inertia ixx="${(1/12) * body_mass * (3*body_radius*body_radius + body_length*body_length)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * body_mass * (3*body_radius*body_radius + body_length*body_length)}" iyz="0.0"
+               izz="${(1/2) * body_mass * (body_radius*body_length)}" />
+    </inertial>
+  </link>
+
+  <joint name="body_joint" type="fixed">
+    <parent link="chassis"/>
+    <child link="body"/>
+    <origin rpy="0 0 0" xyz="0.16 0 0.225"/>
+  </joint>
+
+  <link name="head">
+    <visual>
+      <geometry>
+        <box size="${head_size} ${head_size} ${head_size}"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${head_size} ${head_size} ${head_size}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="${head_mass}"/>
+      <inertia ixx="${(1/12) * head_mass * (head_size*head_size+head_size*head_size)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * head_mass * (head_size*head_size+head_size*head_size)}" iyz="0.0"
+               izz="${(1/12) * head_mass * (head_size*head_size+head_size*head_size)}" />
+    </inertial>
+  </link>
+
+  <joint name="head_joint" type="fixed">
+    <parent link="body"/>
+    <child link="head"/>
+    <origin rpy="0 0 0" xyz="0 0 0.25"/>
+  </joint>
+
+  <link name="right_antenna">
+    <visual>
+      <geometry>
+        <box size="${antenna_x_y} ${antenna_x_y} ${antenna_z}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${antenna_x_y} ${antenna_x_y} ${antenna_z}"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="${antenna_mass}"/>
+      <inertia ixx="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_z*antenna_z)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_z*antenna_z)}" iyz="0.0"
+               izz="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_x_y*antenna_x_y)}" />
+    </inertial>
+  </link>
+
+  <joint name="right_antenna_joint" type="fixed">
+    <parent link="head"/>
+    <child link="right_antenna"/>
+    <origin rpy="0 0 0" xyz="0 0.045 0.11"/>
+  </joint>
+
+  <link name="left_antenna">
+    <visual>
+      <geometry>
+        <box size="${antenna_x_y} ${antenna_x_y} ${antenna_z}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${antenna_x_y} ${antenna_x_y} ${antenna_z}"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="${antenna_mass}"/>
+      <inertia ixx="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_z*antenna_z)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_z*antenna_z)}" iyz="0.0"
+               izz="${(1/12) * antenna_mass * (antenna_x_y*antenna_x_y+antenna_x_y*antenna_x_y)}" />
+    </inertial>
+  </link>
+
+  <joint name="left_antenna_joint" type="fixed">
+    <parent link="head"/>
+    <child link="left_antenna"/>
+    <origin rpy="0 0 0" xyz="0 -0.045 0.11"/>
+  </joint>
+
+  <link name="right_eye">
+    <visual>
+      <geometry>
+        <box size="${eye_size} ${eye_size} ${eye_size}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${eye_size} ${eye_size} ${eye_size}"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="${eye_mass}"/>
+      <inertia ixx="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" iyz="0.0"
+               izz="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" />
+    </inertial>
+  </link>
+
+  <joint name="right_eye_joint" type="fixed">
+    <parent link="head"/>
+    <child link="right_eye"/>
+    <origin rpy="0 0 0" xyz="0.085 0.045 0.015"/>
+  </joint>
+
+  <link name="left_eye">
+    <visual>
+      <geometry>
+        <box size="${eye_size} ${eye_size} ${eye_size}"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${eye_size} ${eye_size} ${eye_size}"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="${eye_mass}"/>
+      <inertia ixx="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" iyz="0.0"
+               izz="${(1/12) * eye_mass * (eye_size*eye_size+eye_size*eye_size)}" />
+    </inertial>
+  </link>
+
+  <joint name="left_eye_joint" type="fixed">
+    <parent link="head"/>
+    <child link="left_eye"/>
+    <origin rpy="0 0 0" xyz="0.085 -0.045 0.015"/>
+  </joint>
+
+  <link name="mouth">
+    <visual>
+      <geometry>
+        <box size="${mouth_x} ${mouth_y} ${mouth_z}"/>
+      </geometry>
+      <material name="red"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${mouth_x} ${mouth_y} ${mouth_z}"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="${mouth_mass}"/>
+      <inertia ixx="${(1/12) * mouth_mass * (mouth_y*mouth_y+mouth_z*mouth_z)}" ixy="0.0" ixz="0.0"
+               iyy="${(1/12) * mouth_mass * (mouth_x*mouth_x+mouth_z*mouth_z)}" iyz="0.0"
+               izz="${(1/12) * mouth_mass * (mouth_x*mouth_x+mouth_y*mouth_y)}" />
+    </inertial>
+  </link>
+
+  <joint name="mouth_joint" type="fixed">
+    <parent link="head"/>
+    <child link="mouth"/>
+    <origin rpy="0 0 0" xyz="0.085 0 -0.04"/>
+  </joint>
+
+    <gazebo reference="chassis">
+        <material>Gazebo/Orange</material>
+    </gazebo>
+
+    <joint name="left_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="left_wheel"/>
+        <origin xyz="0 ${wheel_offset_y} 0" rpy="-${pi/2} 0 0" />
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <link name="left_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${wheel_mass}" />
+            <inertia ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0.0" ixz="0.0"
+                     iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0.0"
+                     izz="${(1/2) * wheel_mass * (wheel_radius*wheel_radius)}" />
+        </inertial>
+    </link>
+
+    <gazebo reference="left_wheel">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <joint name="right_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_wheel"/>
+        <origin xyz="0 ${-wheel_offset_y} 0" rpy="${pi/2} 0 0" />
+        <axis xyz="0 0 -1"/>
+    </joint>
+
+    <link name="right_wheel">
+        <visual>
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_thickness}"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${wheel_radius}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${wheel_mass}" />
+            <inertia ixx="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" ixy="0.0" ixz="0.0"
+                     iyy="${(1/12) * wheel_mass * (3*wheel_radius*wheel_radius + wheel_thickness*wheel_thickness)}" iyz="0.0"
+                     izz="${(1/2) * wheel_mass * (wheel_radius*wheel_radius)}" />
+        </inertial>
+    </link>
+
+    <gazebo reference="right_wheel">
+        <material>Gazebo/Blue</material>
+    </gazebo>
+
+    <joint name="caster_wheel_joint" type="fixed">
+        <parent link="chassis"/>
+        <child link="caster_wheel"/>
+        <origin xyz="${caster_wheel_offset_x} 0 ${caster_wheel_offset_z}"/>
+    </joint>
+
+
+    <link name="caster_wheel">
+        <visual>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <geometry>
+                <sphere radius="${caster_wheel_radius}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="${caster_wheel_mass}" />
+            <inertia ixx="${(2/5) * caster_wheel_mass * (caster_wheel_radius*caster_wheel_radius)}" ixy="0.0" ixz="0.0"
+                     iyy="${(2/5) * caster_wheel_mass * (caster_wheel_radius*caster_wheel_radius)}" iyz="0.0"
+                     izz="${(2/5) * caster_wheel_mass * (caster_wheel_radius*caster_wheel_radius)}" />
+        </inertial>
+    </link>
+
+    <gazebo reference="caster_wheel">
+        <material>Gazebo/White</material>
+        <mu1 value="0.001"/>
+        <mu2 value="0.001"/>
+    </gazebo>
+
+</robot>
+
+  
