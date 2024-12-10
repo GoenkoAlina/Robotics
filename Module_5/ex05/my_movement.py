@@ -13,20 +13,55 @@ class MyMovement(Node):
             Twist, 
             '/robot/cmd_vel', 
             10)
-        self.timer = self.create_timer(0.5, self.callback)
+        self.command = self.declare_parameter(
+            'command', 'square').get_parameter_value().string_value
+        if self.command == 'square':
+            self.timer = self.create_timer(0.5, self.square_callback)
+        elif self.command == 'triangle':
+            self.timer = self.create_timer(0.5, self.triangle_callback)
+        elif self.command == 'snake':
+            self.timer = self.create_timer(0.5, self.snake_callback)
         self.counter = 0.
-
-    def callback(self):
+        self.direction = 1.
+    
+    def square_callback(self):
         move = Twist()
-       
-        move.angular.z = sin(self.counter)
-        move.linear.x = 5.0
-        self.publisher_cmd_vel.publish(move)
-        if self.counter >= 2 * 3.14:
-            self.counter = 0.
+        if self.counter < 20:
+            move.linear.x = 1.0
+        # elif self.counter < 27:
+        elif self.counter < 32:
+            move.angular.z = 0.8
+            move.linear.x = 0.2
         else:
-            self.counter += 0.05
+            self.counter = 0
+        self.publisher_cmd_vel.publish(move)
+        self.counter += 1
 
+    def triangle_callback(self):
+        move = Twist()
+        if self.counter < 20:
+            move.linear.x = 1.0
+        elif self.counter < 38:
+            move.angular.z = 0.8
+            move.linear.x = 0.2
+        else:
+            self.counter = 0
+        self.publisher_cmd_vel.publish(move)
+        self.counter += 1
+
+
+    def snake_callback(self):
+        move = Twist()
+        if self.counter < 20:
+            move.linear.x = 1.0
+        elif self.counter < 44:
+            move.angular.z = self.direction * 0.8
+            move.linear.x = 0.8
+        else:
+            self.counter = 0
+            self.direction *= -1
+        self.publisher_cmd_vel.publish(move)
+        self.counter += 1
 
 def main():
     rclpy.init()

@@ -51,6 +51,7 @@ def generate_launch_description():
         parameters=[{'robot_description': Command(['xacro ', urdf_path])}],
         condition=UnlessCondition(LaunchConfiguration('gui'))
     )
+    
     joint_state_publisher_gui_node = Node(
         package='joint_state_publisher_gui',
         executable='joint_state_publisher_gui',
